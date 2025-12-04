@@ -85,7 +85,7 @@ const setupIdentities = async () => {
       existingContent = fs.readFileSync(ENV_PATH, 'utf-8');
     }
   } catch (error) {
-    console.error(chalk.red(`\nError al leer ${ENV_PATH}. Se creará o se sobrescribirá sin contenido previo.`), error);
+    console.error(chalk.red(`\n Error reading ${ENV_PATH}.`), error);
   }
 
   const newKeysContent =
