@@ -8,10 +8,10 @@ export class EnvironmentManager {
 
     const networks = {
       testnet: {
-        indexer: "https://indexer.testnet-02.midnight.network/api/v1/graphql",
-        indexerWS:
+        indexer: process.env.INDEXER_URL || "https://indexer.testnet-02.midnight.network/api/v1/graphql",
+        indexerWS: process.env.INDEXER_WS_URL ||
           "wss://indexer.testnet-02.midnight.network/api/v1/graphql/ws",
-        node: "https://rpc.testnet-02.midnight.network",
+        node: process.env.NODE_URL || "https://rpc.testnet-02.midnight.network",
         proofServer: process.env.PROOF_SERVER_URL || "http://127.0.0.1:6300",
         name: "Testnet",
       },
@@ -23,7 +23,7 @@ export class EnvironmentManager {
   static validateEnvironment(): void {
     const required = ["WALLET_SEED"];
     const missing = required.filter((key) => !process.env[key]);
-
+    
     if (missing.length > 0) {
       throw new Error(
         `Missing required environment variables: ${missing.join(", ")}`

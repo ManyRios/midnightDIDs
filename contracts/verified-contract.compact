@@ -1,0 +1,26 @@
+// contract: verify the contract
+
+pragma language_version >= 0.16;
+
+import CompactStandardLibrary;
+
+export ledger verification_count: U64;
+
+type VerifiablePresentation = Opaque<"VerifiablePresentation">;
+
+type VerificationResult = Opaque<"string">;
+
+
+// Run the ZKP On-Chain Test verification
+export circuit verify_age_proof(
+    presentation: VerifiablePresentation, 
+    required_issuer_did: Opaque<"string">
+): [VerificationResult] {
+
+    const result = CompactStandardLibrary::verify_zkp_presentation(
+        presentation, 
+        required_issuer_did
+    );
+ 
+    return [result];
+}
