@@ -1,4 +1,5 @@
 import "dotenv/config";
+import fs from 'fs'
 import { WalletBuilder } from "@midnight-ntwrk/wallet";
 import { NetworkId } from '@midnight-ntwrk/zswap';
 import { generateRandomSeed, HDWallet, Roles } from '@midnight-ntwrk/wallet-sdk-hd';
@@ -9,6 +10,7 @@ import { getWalletAddress } from "./utils/utils"
 
 const { indexer, indexerWS, node, proofServer } = EnvironmentManager.getNetworkConfig()
 
+const ENV_PATH = '.env'
 
 const generateSeed = (): Buffer => {
   const seed = generateRandomSeed();
@@ -39,7 +41,7 @@ const buildStartWallet = async (name: string) => {
   const derivedSeedToHex = derivedSeedBuffer.toString('hex');
 
   console.log(`[!] Seed HD (Hex) ${name}: ${chalk.yellow(derivedSeedToHex)}`);
-  
+
   const wallet = await WalletBuilder.build(
     indexer,
     indexerWS,
@@ -77,11 +79,32 @@ const setupIdentities = async () => {
 
   // Close wallets after gets the information
 
+  let existingContent = '';
+  try {
+    if (fs.existsSync(ENV_PATH)) {
+      existingContent = fs.readFileSync(ENV_PATH, 'utf-8');
+    }
+  } catch (error) {
+    console.error(chalk.red(`\nError al leer ${ENV_PATH}. Se creará o se sobrescribirá sin contenido previo.`), error);
+  }
+
+  const newKeysContent =
+    `\n\n# --- DID KEYS did-management.ts ---\n` +
+    `ISSUER_SEED_HEX=${issuerResult.seed}\n` +
+    `HOLDER_SEED_HEX=${ownerResult.seed}\n` +
+    `HOLDER_DID_ADDRESS=${ownerResult.did}\n` +
+    `ISSUER_DID_ADDRESS=${issuerResult.did}\n`;
+
+
+  const finalContent = existingContent + newKeysContent;
+
+  fs.writeFileSync(ENV_PATH, finalContent);
+
   await issuerResult.wallet.close();
   await ownerResult.wallet.close();
 }
 
 setupIdentities().catch(error => {
-    console.error(chalk.red("\n Fatal Error during configuration"), error);
+  console.error(chalk.red("\n Fatal Error during configuration"), error);
 });
 
