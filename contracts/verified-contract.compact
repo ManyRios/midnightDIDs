@@ -4,23 +4,25 @@ pragma language_version >= 0.16;
 
 import CompactStandardLibrary;
 
-export ledger verification_count: U64;
-
-type VerifiablePresentation = Opaque<"VerifiablePresentation">;
-
 type VerificationResult = Opaque<"string">;
 
+type DidAddress = Opaque<"string">;
+
+type VerificationResult = bool;
+
+export ledger successfulVerifications: Uint64;
 
 // Run the ZKP On-Chain Test verification
-export circuit verify_age_proof(
+export circuit verifyAgeProof(
     presentation: VerifiablePresentation, 
-    required_issuer_did: Opaque<"string">
+    requiredIssuerDid: DidAddress 
 ): [VerificationResult] {
 
-    const result = CompactStandardLibrary::verify_zkp_presentation(
-        presentation, 
-        required_issuer_did
-    );
- 
-    return [result];
+    const isValid: VerificationResult = nativeVerifyZkp(presentation, requiredIssuerDid); 
+
+    if (isValid) {
+        successfulVerifications = successfulVerifications + 1;
+    }
+
+    return [isValid];
 }
