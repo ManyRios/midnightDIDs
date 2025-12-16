@@ -9,7 +9,7 @@
     "dev": "concurrently \"npm run proof-server\" \"npm run watch\"",
     "watch": "nodemon --config nodemon.json",
     "setup": "npm run compile && npm run build && npm run deploy",
-    "compile": "compact compile contracts/hello-world.compact contracts/managed/hello-world",
+    "compile": "compact compile contracts/hello-world.compact contracts/managed/hello-world && compact compile contracts/verified-contract.compact contracts/managed/verified-contract",
     "build": "tsc",
     "deploy": "node dist/deploy.js",
     "cli": "node dist/cli.js",
